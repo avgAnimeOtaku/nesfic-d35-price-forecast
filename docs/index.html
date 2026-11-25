@@ -11,8 +11,8 @@
 <style>
   :root {
     color-scheme: light;
-    --board: #16382F; --chalk: #FFFFFF; --chalk-dim: rgba(255, 255, 255, .74); --yellow: #FFD23F;
-    --page: #FFFFFF; --wash: #F1F4F0; --ink: #14211D; --ink-2: #55625C; --line: #D5DCD6;
+    --board: #0F3F8C; --chalk: #FFFFFF; --chalk-dim: rgba(255, 255, 255, .74); --yellow: #FFD23F;
+    --page: #FFFFFF; --wash: #EEF3FB; --ink: #101B2D; --ink-2: #51607A; --line: #D3DBE8;
     --a: #257de0; --r: #f47230;
     --font: "Anek Latin", "Segoe UI", system-ui, sans-serif;
   }
@@ -150,7 +150,7 @@
   const AS = { Potato: 'আলু' }; // Assamese name shown on the board. Add other crops only once a native reader has checked the spelling.
   // The newest week with a price anywhere in the data. A district with nothing in the 4 weeks before it gets no current forecast.
   const NOW = Math.max(...Object.values(W.crops).flatMap(c => Object.values(c.districts).concat(c.ref ? [c.ref.series] : [])).map(s => Math.max(...s.map(e => e[0]))));
-  const C = { a: '#257de0', r: '#f47230', ink: '#14211D', ink2: '#55625C', line: '#D5DCD6', yellow: '#FFD23F' };
+  const C = { a: '#257de0', r: '#f47230', ink: '#101B2D', ink2: '#51607A', line: '#D3DBE8', yellow: '#FFD23F' };
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const VW = 720, PAD = { l: 52, r: 78, t: 16, b: 30 };
   const rs = v => 'Rs ' + Math.round(v).toLocaleString('en-IN');
@@ -209,7 +209,7 @@
     let ticks = '';
     for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks += `<line x1="${X(t)}" x2="${X(t)}" y1="84" y2="91" stroke="rgba(255,255,255,.5)"/>` + txt(X(t), 106, t.toLocaleString('en-IN'), 'middle', 'rgba(255,255,255,.74)', 12);
     const now = X(v.base), fc = X(v.point);
-    const actual = v.actual == null ? '' : `<circle cx="${X(v.actual)}" cy="66" r="8" fill="#16382F" stroke="#fff" stroke-width="3"/>` + txt(clamp(X(v.actual)), 36, 'what happened', 'middle', '#fff', 12) + `<line x1="${X(v.actual)}" x2="${X(v.actual)}" y1="40" y2="56" stroke="#fff"/>`;
+    const actual = v.actual == null ? '' : `<circle cx="${X(v.actual)}" cy="66" r="8" fill="#0F3F8C" stroke="#fff" stroke-width="3"/>` + txt(clamp(X(v.actual)), 36, 'what happened', 'middle', '#fff', 12) + `<line x1="${X(v.actual)}" x2="${X(v.actual)}" y1="40" y2="56" stroke="#fff"/>`;
     return `<svg class="ruler" viewBox="0 0 480 112" role="img" aria-label="Price scale. ${v.label} ${rs(v.base)}. Forecast ${rs(v.point)}, likely between ${rs(v.lo)} and ${rs(v.hi)}.${v.actual == null ? '' : ' What happened: ' + rs(v.actual) + '.'}">
       <line x1="20" x2="460" y1="84" y2="84" stroke="rgba(255,255,255,.5)"/>${ticks}
       <rect x="${X(v.lo)}" y="54" width="${Math.max(2, X(v.hi) - X(v.lo))}" height="24" rx="5" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.6)"/>
