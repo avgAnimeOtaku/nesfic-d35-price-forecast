@@ -1,0 +1,40 @@
+rows: Assam 27516 in 22 districts (mirror 26454, recent 1125); Siliguri 6261 (mirror 5878, recent 386); mirror ends 2026-04-20
+mirror check: 801/820 official rows found in the mirror (97.7%)
+Kamrup district, Assam (Guwahati area): 4956 rows (3 dropped), 2003-02-17 to 2026-11-23, 896/1241 weeks (72.2%)
+  markets: P.O. Uparhali Guwahati 3252 [2003-02-19..2019-12-31]; Pamohi(Garchuk) APMC 687 [2025-12-15..2026-11-24]; Goreswar 447 [2006-05-17..2017-05-09]; Pamohi (Garchuk) 369 [2018-08-19..2023-12-22]; Pamohi (Garchuk) APMC 91 [2025-12-17..2026-04-18]; Uparhali Pmy APMC 56 [2026-06-09..2026-11-21]
+  weeks per year: 2003:39 2004:47 2005:51 2006:49 2007:51 2008:46 2009:42 2010:26 2011:52 2012:51 2013:52 2014:52 2015:52 2016:50 2017:52 2018:52 2019:52 2022:17 2023:13 2025:3 2026:47
+Siliguri market, West Bengal: 6261 rows (2 dropped), 2012-06-25 to 2026-11-23, 612/753 weeks (81.3%)
+  markets: Siliguri 5875 [2012-06-29..2025-10-31]; Siliguri APMC 386 [2025-11-01..2026-11-24]
+  weeks per year: 2012:19 2013:8 2014:11 2015:50 2016:51 2017:51 2018:53 2019:48 2020:31 2021:42 2022:50 2023:46 2024:53 2025:52 2026:47
+lag correlation: -4:0.047(346) -3:0.111(346) -2:0.121(346) -1:0.217(346) 0:0.245(346) 1:0.184(345) 2:0.07(343) 3:0.141(341) 4:0.026(339)
+
+LEAD  h  n    naive  seasonal  refAdj  model  gain  direction  cover80
+      1  50  7.64  7.64  7.64  7.66  -0.3%  53.8% of 26  74%
+      2  48  10.67  10.67  10.67  10.66  0.1%  59.4% of 32  77.1%
+      4  46  11.5  11.5  11.5  12  -4.4%  73.3% of 30  78.3%
+
+district               rows   weeks  cov%   h1 n/naive/model/gain        h4 n/naive/model/gain
+Kamrup                 4956   896    72.2   50/7.64/7.66/-0.3%           46/11.5/12/-4.4%
+Barpeta                3732   712    58.9   -                            -
+Nagaon                 2548   666    54.5   40/10.05/10.15/-1%           37/17.23/16.15/6.3%
+Jorhat                 1904   532    46.7   -                            -
+Bongaigaon             1850   564    56     -                            -
+Darrang                1816   493    37.7   -                            -
+Cachar                 1789   480    49.1   -                            -
+Golaghat               1404   437    44.6   -                            -
+Dibrugarh              1355   328    53.4   84/1.39/1.58/-13.3%          75/3.74/4.79/-28.2%
+Dhubri                 946    354    29.7   -                            -
+Sonitpur               946    288    26.9   52/9.13/9.23/-1.1%           46/15.89/15.6/1.8%
+Sibsagar               846    217    23.1   -                            -
+Hailakandi             724    239    26.5   -                            -
+Kokrajhar              632    185    27.9   -                            -
+Tinsukia               533    251    20.6   -                            -
+Nalbari                442    151    16.2   -                            -
+Karimganj              417    176    17.9   -                            -
+Dhemaji                361    114    10.5   -                            -
+Goalpara               212    90     9.1    -                            -
+Lakhimpur              74     23     88.5   -                            -
+Hojai                  24     11     33.3   -                            -
+Morigaon               5      5      83.3   -                            -
+pooled: {"h1":{"districts":4,"n":226,"naive":6.09,"model":6.2,"gainPct":-1.9},"h2":{"districts":4,"n":218,"naive":8.61,"model":8.72,"gainPct":-1.4},"h4":{"districts":4,"n":204,"naive":10.68,"model":10.91,"gainPct":-2.2}}
+latest: {"h1":{"forWeek":"2026-11-30","madeInWeek":"2026-11-23","lastKnownPrice":1500,"lastKnownAgeWeeks":0,"forecast":1501,"low":1348,"high":1718,"changePct":0.1,"advice":"NO CLEAR SIGNAL","trainedOn":888},"h2":{"forWeek":"2026-12-07","madeInWeek":"2026-11-23","lastKnownPrice":1500,"lastKnownAgeWeeks":0,"forecast":1476,"low":1286,"high":1756,"changePct":-1.6,"advice":"NO CLEAR SIGNAL","trainedOn":882},"h4":{"forWeek":"2026-12-21","madeInWeek":"2026-11-23","lastKnownPrice":1500,"lastKnownAgeWeeks":0,"forecast":1432,"low":1208,"high":1762,"changePct":-4.6,"advice":"NO CLEAR SIGNAL","trainedOn":871}}

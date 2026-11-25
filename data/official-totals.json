@@ -1,0 +1,6 @@
+{
+  "note": "Record counts reported by the data.gov.in service on 25 Nov 2026 for the newest records (lowercase-field index), used to state how complete each download is.",
+  "kamrup": { "file": "assam-kamrup-potato-2026.jsonl", "total": 811 },
+  "siliguri": { "file": "wb-siliguri-potato-2026.jsonl", "total": 386 },
+  "assamAll": { "file": "assam-potato-2026.jsonl", "total": 2461 }
+}

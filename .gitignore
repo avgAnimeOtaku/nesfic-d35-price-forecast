@@ -1,0 +1,6 @@
+# Draft portal answers with the team's blanks: not for the public repository
+proposal/
+# Local screenshot used to check the web app
+out/webapp-check.png
+# Template for the portal answers (same draft text)
+proposal.js
