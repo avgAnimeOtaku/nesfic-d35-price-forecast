@@ -1,3 +1,10 @@
+extra crop Tomato: 14126 records (22 dropped as outliers), 13 districts with 60 or more weeks, Kamrup 550 weeks to 2026-11-23
+extra crop Cabbage: 13480 records (8 dropped as outliers), 16 districts with 60 or more weeks, Kamrup 554 weeks to 2026-11-23
+extra crop Cauliflower: 9184 records (7 dropped as outliers), 10 districts with 60 or more weeks, Kamrup 384 weeks to 2026-11-23
+extra crop Pumpkin: 10915 records (4 dropped as outliers), 9 districts with 60 or more weeks, Kamrup 536 weeks to 2026-11-23
+extra crop Brinjal: 15190 records (3 dropped as outliers), 11 districts with 60 or more weeks, Kamrup 501 weeks to 2026-11-23
+extra crop Onion: 23210 records (5 dropped as outliers), 19 districts with 60 or more weeks, Kamrup 893 weeks to 2026-11-23
+extra crop Green Chilli: 23426 records (49 dropped as outliers), 16 districts with 60 or more weeks, Kamrup 657 weeks to 2026-11-23
 rows: Assam 27516 in 22 districts (mirror 26454, recent 1125); Siliguri 6261 (mirror 5878, recent 386); mirror ends 2026-04-20
 mirror check: 801/820 official rows found in the mirror (97.7%)
 Kamrup district, Assam (Guwahati area): 4956 rows (3 dropped), 2003-02-17 to 2026-11-23, 896/1241 weeks (72.2%)

@@ -1,6 +1,32 @@
 {
   "note": "Record counts reported by the data.gov.in service on 25 Nov 2026 for the newest records (lowercase-field index), used to state how complete each download is.",
-  "kamrup": { "file": "assam-kamrup-potato-2026.jsonl", "total": 811 },
-  "siliguri": { "file": "wb-siliguri-potato-2026.jsonl", "total": 386 },
-  "assamAll": { "file": "assam-potato-2026.jsonl", "total": 2461 }
+  "kamrup": {
+    "file": "assam-kamrup-potato-2026.jsonl",
+    "total": 811
+  },
+  "siliguri": {
+    "file": "wb-siliguri-potato-2026.jsonl",
+    "total": 386
+  },
+  "assamAll": {
+    "file": "assam-potato-2026.jsonl",
+    "total": 2461
+  },
+  "crops": {
+    "Tomato": 422,
+    "Cabbage": 407,
+    "Cauliflower": 304,
+    "Pumpkin": 421,
+    "Brinjal": 797,
+    "Onion": 743,
+    "Green Chilli": 2553
+  },
+  "cropsNote": "Newest Kamrup records per extra crop, counted the same way. A crop is shown in the web app only when its file data/assam-kamrup-<crop>-2026.jsonl holds this many records.",
+  "staples": {
+    "Paddy": 46,
+    "Jute": 11,
+    "Arecanut": 1,
+    "Mustard": 303
+  },
+  "staplesNote": "Newest records for all of Assam (lowercase-field index, from late 2025), counted on 25 Nov 2026. The bulk copy holds no Assam records for paddy, jute or arecanut dated 2023 or later, and 5 for mustard."
 }

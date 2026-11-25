@@ -89,10 +89,10 @@ const forecasts = (A, R) => Object.fromEntries(SETUP.horizons.map(h => ['h' + h,
 
 // ---- comparison market and every Assam district
 const ref = describe('Siliguri market, West Bengal', refRows), R = ref.series;
-const byDistrict = new Map();
 // The two sources spell districts in different cases (BONGAIGAON, Bongaigaon), so names are normalised before grouping.
 const titleCase = s => String(s).trim().toLowerCase().split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-for (const r of assamRows) { const d = titleCase(r.district); if (!byDistrict.has(d)) byDistrict.set(d, []); byDistrict.get(d).push(r); }
+const groupByDistrict = rows => { const m = new Map(); for (const r of rows) { const d = titleCase(r.district); if (!m.has(d)) m.set(d, []); m.get(d).push(r); } return m; };
+const byDistrict = groupByDistrict(assamRows);
 
 let lead = null, leadBt = null;
 const districts = [], pooledSum = {};
@@ -147,7 +147,26 @@ const results = {
 };
 fs.mkdirSync(path.join(__dirname, 'out'), { recursive: true });
 fs.writeFileSync(path.join(__dirname, 'out', 'results.json'), JSON.stringify(results, null, 1));
-fs.writeFileSync(path.join(__dirname, 'out', 'weekly.json'), JSON.stringify({ generatedAt: results.generatedAt, lead: LEAD, ref: { label: ref.info.label, series: [...R] }, districts: weekly }));
+// ---- more crops for the web app: the same cleaning and weekly prices, with no comparison market.
+// They are not part of results.json, so the Proof of Work and the proposal text stay about potato.
+// Rice is left out on purpose: its reported Kamrup price jumps from about Rs 3,300 to Rs 7,500 within two weeks in February 2026
+// and stays there, which reads as a change in what is being reported and not a market move.
+const EXTRA = ['Tomato', 'Cabbage', 'Cauliflower', 'Pumpkin', 'Brinjal', 'Onion', 'Green Chilli'];
+const crops = { Potato: { lead: LEAD, ref: { label: ref.info.label, series: [...R] }, districts: weekly } };
+for (const crop of EXTRA) {
+  const slug = crop.toLowerCase().split(' ').join('-'), got = lineCount(`assam-kamrup-${slug}-2026.jsonl`), want = (totals.crops || {})[crop];
+  // The newest records arrive in no date order, so a part-finished download would leave false gaps. Such a crop is left out.
+  if (!want || got < want) { console.log(`extra crop ${crop}: newest records not fully downloaded (${got} of ${want}), left out`); continue; }
+  const rows = uniq(load([`hf-assam-${slug}.jsonl`, `assam-kamrup-${slug}-2026.jsonl`]));
+  const cropDistricts = {};
+  let dropped = 0;
+  for (const [district, rs] of groupByDistrict(rows)) { const s = weeklySeries(rs); dropped += s.dropped; if (s.size >= 60) cropDistricts[district] = [...s]; }
+  if (!cropDistricts[LEAD]) { console.log(`extra crop ${crop}: no usable ${LEAD} series, left out`); continue; }
+  crops[crop] = { lead: LEAD, ref: null, districts: cropDistricts };
+  const lastLead = cropDistricts[LEAD].reduce((m, e) => Math.max(m, e[0]), 0);
+  console.log(`extra crop ${crop}: ${rows.length} records (${dropped} dropped as outliers), ${Object.keys(cropDistricts).length} districts with 60 or more weeks, ${LEAD} ${cropDistricts[LEAD].length} weeks to ${iso(lastLead)}`);
+}
+fs.writeFileSync(path.join(__dirname, 'out', 'weekly.json'), JSON.stringify({ generatedAt: results.generatedAt, crops }));
 
 // ---- console summary
 const dd = results.data;
