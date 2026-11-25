@@ -38,10 +38,11 @@ const expected = JSON.parse(src('out/results.json')).latest.h4;
 assert.strictEqual(Math.round(f.point), expected.forecast, 'browser bundle and analysis disagree on the 4-week forecast');
 assert.strictEqual(f.advice, expected.advice);
 // Every district in the dropdown, at every look-ahead, must yield a forecast, a test result and a calendar without error.
-const swept = vm.runInContext(`(function () {
-  var R = new Map(WEEKLY.ref.series), n = 0;
+// The page also replays the model over each district's whole record; that replay is checked here and its pooled result printed.
+const swept = JSON.parse(vm.runInContext(`(function () {
+  var R = new Map(WEEKLY.ref.series), n = 0, pool = { 1: [], 2: [], 4: [] };
   for (var name of Object.keys(WEEKLY.districts)) {
-    var A = new Map(WEEKLY.districts[name]), lastA = Math.max.apply(null, Array.from(A.keys()));
+    var A = new Map(WEEKLY.districts[name]), ks = Array.from(A.keys()), lastA = Math.max.apply(null, ks);
     for (var h of [1, 2, 4]) {
       var f = D35.forecastLatest(A, R, h);
       if (f.noRecentPrice) f = D35.forecastLatest(A, new Map(Array.from(R).filter(function (e) { return e[0] <= lastA; })), h); // the page's fallback for a quiet district
@@ -51,7 +52,25 @@ const swept = vm.runInContext(`(function () {
     var bt = D35.backtest(A, R, { horizons: [1, 2, 4], testWeeks: 156, refitEvery: 26 });
     if (!(bt[1].n >= 0 && bt[4].n >= 0)) throw new Error('bad test result for ' + name);
     if (D35.seasonCalendar(A).length !== 12) throw new Error('bad calendar for ' + name);
+    var whole = D35.backtest(A, R, { horizons: [1, 2, 4], testWeeks: lastA - Math.min.apply(null, ks) + 1, refitEvery: 26 });
+    for (var h of [1, 2, 4]) {
+      var pts = whole[h].points, fittedSeen = false;
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i], fitted = p.hi > p.lo;
+        if (i && p.week <= pts[i - 1].week) throw new Error('past forecasts out of order for ' + name);
+        if (fittedSeen && !fitted) throw new Error('unfitted forecast after a fitted one for ' + name); // the page leaves unfitted ones out as "the first weeks"
+        if (!(p.base > 0 && p.model > 0 && p.lo > 0 && p.actual > 0)) throw new Error('bad past forecast for ' + name);
+        if (fitted) { fittedSeen = true; pool[h].push(p); }
+      }
+    }
   }
-  return n;
-})()`, box);
-console.log(`docs/ built. Bundle check passed: 4-week forecast Rs ${Math.round(f.point)}; ${swept} district-and-horizon forecasts all valid.`);
+  var miss = function (pts, k) { return pts.reduce(function (s, p) { return s + 100 * Math.abs(p[k] - p.actual) / p.actual; }, 0) / pts.length; };
+  return JSON.stringify({ n: n, whole: [1, 2, 4].map(function (h) {
+    var calls = pool[h].filter(function (p) { return Math.abs(p.model / p.base - 1) >= 0.05; });
+    return { h: h, n: pool[h].length, naive: miss(pool[h], 'naive'), model: miss(pool[h], 'model'), calls: calls.length,
+      right: calls.filter(function (p) { return Math.sign(p.model - p.base) === Math.sign(p.actual - p.base); }).length };
+  }) });
+})()`, box));
+console.log(`docs/ built. Bundle check passed: 4-week forecast Rs ${Math.round(f.point)}; ${swept.n} district-and-horizon forecasts all valid.`);
+console.log('Whole-record replay, all districts (the test shown on the web page):');
+for (const w of swept.whole) console.log(`  ${w.h} week(s) ahead: ${w.n} forecasts, miss ${w.model.toFixed(1)}% against ${w.naive.toFixed(1)}% for "price stays the same"; ${w.calls} hold or sell calls (${Math.round(100 * w.calls / w.n)}%), direction right in ${Math.round(100 * w.right / w.calls)}%`);

@@ -4,7 +4,7 @@ A working prototype for **NESFIC 2026, challenge NESFIC-D-35**: Agricultural Com
 
 **Live demo:** https://avgAnimeOtaku.github.io/nesfic-d35-price-forecast/
 
-Pick an Assam district and a look-ahead of 1, 2 or 4 weeks. The page works out a price forecast in your browser, shows how the model did when tested against history in that district, and shows which months usually bring high and low prices.
+Pick an Assam district and a look-ahead of 1, 2 or 4 weeks. The page works out a price forecast in your browser. You can step back to any past week to see what the model said then and what the price did next. It also shows the model track record in that district and which months usually bring high and low prices.
 
 - [Proof of Work (web page)](https://avgAnimeOtaku.github.io/nesfic-d35-price-forecast/proof-of-work.html)
 - [Proof of Work (PDF)](docs/NESFIC-D-35-Proof-of-Work.pdf)
@@ -13,7 +13,8 @@ Pick an Assam district and a look-ahead of 1, 2 or 4 weeks. The page works out a
 
 The prototype runs end to end on real public data, and it is reported as it is:
 
-- **It ties the simplest method and does not yet beat it.** Across 4 Assam districts and 226 test forecasts, the 1-week error is 6.2%, against 6.1% for assuming the price stays where it is.
+- **Over the last 156 weeks it ties the simplest method and does not beat it.** Across 4 Assam districts and 226 test forecasts, the 1-week error is 6.2%, against 6.1% for assuming the price stays where it is.
+- **Over the whole price record it is behind at short range.** The web app replays the model over the full history of 19 districts (`node build-web.js` prints these figures). One week ahead, over 6,591 forecasts, it misses by 9.1%, against 8.1% for assuming the price stays the same. Four weeks ahead, over 6,269 forecasts, it misses by 18.1% against 17.6%. Four weeks ahead it makes a hold or sell call in 57% of weeks and has the direction right in 60% of those calls.
 - **The price record is full of gaps.** In Kamrup district (the Guwahati area), a potato price was reported in only 72% of weeks since 2003. Only 4 of 22 districts had enough recent data to test a forecast at all.
 - **The Assam market follows its nearest large market only weakly.** Week-on-week price changes in Kamrup and Siliguri (West Bengal) have a correlation of 0.245.
 - **Prices are strongly seasonal.** Over 18 years, Kamrup prices are usually highest in November and lowest in February.

@@ -3,68 +3,139 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Assam potato price forecast (prototype)</title>
+<title>Potato price outlook for Assam (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,400..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@700&text=%E0%A6%86%E0%A6%B2%E0%A7%81&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: light; --text: #191919; --text2: #666666; --grid: #e7e7e7; --a: #257de0; --r: #f47230; }
+  :root {
+    color-scheme: light;
+    --board: #16382F; --chalk: #FFFFFF; --chalk-dim: rgba(255, 255, 255, .74); --yellow: #FFD23F;
+    --page: #FFFFFF; --wash: #F1F4F0; --ink: #14211D; --ink-2: #55625C; --line: #D5DCD6;
+    --a: #257de0; --r: #f47230;
+    --font: "Anek Latin", "Segoe UI", system-ui, sans-serif;
+  }
   * { box-sizing: border-box; }
-  body { font: 15px/1.5 "Segoe UI", system-ui, Arial, sans-serif; color: var(--text); background: #fff; margin: 0; }
-  main { max-width: 800px; margin: 0 auto; padding: 24px 16px 48px; }
-  h1 { font-size: 26px; margin: 0 0 4px; }
-  h2 { font-size: 18px; margin: 32px 0 8px; padding-top: 12px; border-top: 2px solid var(--text); }
-  p { margin: 8px 0; }
-  a { color: #1757ac; }
-  .sub, .note { color: var(--text2); }
-  .note { font-size: 13px; }
-  .warn { background: #fff6e0; border-left: 4px solid #f2a600; padding: 8px 12px; }
-  .controls { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0 8px; }
-  .controls label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 13px; }
-  select { font: inherit; padding: 8px 10px; border: 1.5px solid var(--text); border-radius: 8px; background: #fff; color: var(--text); min-width: 200px; }
-  .card { border: 1.5px solid var(--text); border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
-  .card-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-weight: 600; margin-bottom: 10px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
-  .grid small { display: block; color: var(--text2); font-size: 12px; }
-  .grid b { display: block; font-size: 22px; }
-  .advice { background: #f1f6fd; border-radius: 8px; padding: 8px 10px; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 400 1rem/1.55 var(--font); font-variant-numeric: tabular-nums; }
+  main { max-width: 760px; margin: 0 auto; padding: 28px 18px 56px; }
+  h1 { font-size: clamp(2rem, 6.4vw, 2.9rem); line-height: 1.02; font-weight: 800; font-stretch: 80%; letter-spacing: -.01em; margin: 0 0 10px; }
+  h2 { font-size: 1.4rem; line-height: 1.2; font-weight: 700; font-stretch: 88%; margin: 44px 0 10px; padding-top: 18px; border-top: 1px solid var(--line); }
+  p { margin: 8px 0; max-width: 68ch; }
+  a { color: var(--board); text-underline-offset: 2px; }
+  :focus-visible { outline: 3px solid var(--board); outline-offset: 2px; border-radius: 4px; }
+  .lede { color: var(--ink-2); font-size: 1.06rem; }
+  .small { font-size: .875rem; color: var(--ink-2); }
+
+  /* pickers */
+  .pick { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; margin: 22px 0 14px; }
+  .pick label, .pick legend { display: block; font-weight: 600; font-size: .875rem; margin-bottom: 5px; padding: 0; }
+  select { font: 600 1rem var(--font); color: var(--ink); background: var(--page); border: 1.5px solid var(--ink); border-radius: 8px; padding: 9px 12px; min-width: 210px; }
+  fieldset { border: 0; margin: 0; padding: 0; }
+  .seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 8px; overflow: hidden; }
+  .seg label { margin: 0; font-size: 1rem; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg span { display: block; padding: 9px 15px; cursor: pointer; border-left: 1.5px solid var(--ink); }
+  .seg label:first-child span { border-left: 0; }
+  .seg input:checked + span { background: var(--board); color: var(--chalk); }
+  .seg input:focus-visible + span { outline: 3px solid var(--yellow); outline-offset: -3px; }
+
+  /* the rate board */
+  .board { background: var(--board); color: var(--chalk); border-radius: 14px; padding: 20px 20px 18px; margin: 0 -6px; }
+  .board-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .crop-as { font: 700 1.7rem/1 "Anek Bangla", var(--font); color: var(--yellow); }
+  .board-head b { font-size: 1.12rem; font-weight: 700; }
+  .board-head time { margin-left: auto; color: var(--chalk-dim); font-size: .95rem; }
+  .prices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 6px; }
+  .prices small { display: block; color: var(--chalk-dim); font-size: .9rem; }
+  .prices strong { display: block; font-size: clamp(2.3rem, 10.5vw, 3.7rem); line-height: .98; font-weight: 800; font-stretch: 76%; }
+  .prices .then strong { color: var(--yellow); }
+  .ruler { display: block; width: 100%; max-width: 560px; height: auto; margin: 6px 0 2px; }
+  .board .reading { color: var(--chalk); font-size: 1.38rem; line-height: 1.2; font-weight: 700; font-stretch: 88%; margin: 12px 0 4px; }
+  .board p { color: var(--chalk-dim); max-width: 62ch; }
+  .board p b { color: var(--chalk); font-weight: 600; }
+  .board .key { font-size: .875rem; margin: 0; }
+  .outcome { border-top: 1px solid rgba(255, 255, 255, .28); margin-top: 14px; padding-top: 12px; }
+  .outcome p:first-child { color: var(--chalk); font-size: 1.06rem; }
+  .flag { border-left: 3px solid var(--yellow); padding-left: 10px; }
+
+  /* week travel */
+  .travel { background: var(--wash); border-radius: 12px; padding: 14px 16px 16px; margin: 14px -6px 0; }
+  .travel p { margin: 0 0 8px; }
+  .travel input[type=range] { width: 100%; accent-color: var(--board); margin: 4px 0 10px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button { font: 600 .95rem var(--font); color: var(--ink); background: var(--page); border: 1.5px solid var(--ink); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+  button.main { background: var(--board); color: var(--chalk); border-color: var(--board); }
+  button:disabled { opacity: .4; cursor: default; }
+
+  .notice { border-left: 4px solid var(--yellow); background: #FFF9E3; padding: 10px 14px; margin: 22px 0 0; }
   .scroll { overflow-x: auto; }
-  table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 8px 0; }
-  th, td { border-bottom: 1px solid var(--grid); padding: 6px 8px; text-align: left; }
-  th { color: var(--text2); font-weight: 600; }
-  tr.on td { background: #f1f6fd; font-weight: 600; }
-  .legend { font-size: 13px; margin: 4px 0; }
-  .legend span { margin-right: 16px; white-space: nowrap; }
-  .legend i, .tip i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; margin: 10px 0; }
+  th, td { text-align: left; padding: 7px 10px 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 600; color: var(--ink-2); font-size: .875rem; }
+  tr.on td { font-weight: 700; background: var(--wash); }
+  tr.on td:first-child { box-shadow: -8px 0 0 var(--wash); }
+  .legend { font-size: .9rem; margin: 6px 0; }
+  .legend span { margin-right: 18px; white-space: nowrap; }
+  .legend i, .tip i { display: inline-block; width: 16px; height: 4px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
   .chart { position: relative; }
   .chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
-  .tip { display: none; position: absolute; top: 8px; background: #fff; border: 1px solid var(--text); border-radius: 8px; padding: 6px 10px; font-size: 13px; pointer-events: none; white-space: nowrap; }
-  footer { margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--grid); font-size: 13px; color: var(--text2); }
+  .tip { display: none; position: absolute; top: 6px; background: var(--page); border: 1.5px solid var(--ink); border-radius: 8px; padding: 6px 10px; font-size: .875rem; pointer-events: none; white-space: nowrap; }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); }
+  footer ul { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px 22px; font-weight: 600; }
+  @media (min-width: 640px) { .board { padding: 26px 28px 22px; } .travel { padding: 16px 22px 18px; } }
 </style>
 </head>
 <body>
 <main>
-  <h1>Potato price forecast for Assam</h1>
-  <p class="sub">A working prototype for NESFIC 2026, challenge D-35 (Agricultural Commodity Price Intelligence and Forecasting). Pick a district. The forecast is worked out in your browser from public market prices.</p>
-  <p class="warn"><b>Prototype, not advice.</b> In our tests this model does about as well as the simplest method, which is to assume the price stays where it is. It does not yet beat it. <a href="proof-of-work.html">See the full test results.</a></p>
+  <h1>Potato price outlook for Assam</h1>
+  <p class="lede">A prototype built for NESFIC 2026, challenge D-35. It reads public market prices and estimates where the wholesale potato price in a district is heading. Everything is worked out here in your browser.</p>
 
-  <form class="controls" onsubmit="return false">
-    <label for="district">District<select id="district"></select></label>
-    <label for="horizon">Look ahead<select id="horizon"><option value="1">1 week</option><option value="2">2 weeks</option><option value="4" selected>4 weeks</option></select></label>
-  </form>
+  <div class="pick">
+    <div><label for="district">District</label><select id="district"></select></div>
+    <fieldset><legend>Look ahead</legend>
+      <div class="seg" id="horizon">
+        <label><input type="radio" name="h" value="1"><span>1 week</span></label>
+        <label><input type="radio" name="h" value="2"><span>2 weeks</span></label>
+        <label><input type="radio" name="h" value="4" checked><span>4 weeks</span></label>
+      </div>
+    </fieldset>
+  </div>
 
-  <section id="card" aria-live="polite"></section>
+  <section class="board" id="board" aria-live="polite"></section>
 
-  <h2>How well does it do in this district?</h2>
-  <section id="accuracy" aria-live="polite"></section>
+  <section class="travel" aria-label="Choose a week">
+    <p><b>See what it said in any past week, and what happened next.</b></p>
+    <input type="range" id="week" min="0" value="0" step="1" aria-label="Week the forecast was made">
+    <div class="btns">
+      <button id="prevSig">Earlier hold or sell call</button>
+      <button id="nextSig">Later hold or sell call</button>
+      <button id="prev" aria-label="One week earlier">Week earlier</button>
+      <button id="next" aria-label="One week later">Week later</button>
+      <button id="latest" class="main">Latest week</button>
+    </div>
+  </section>
+
+  <p class="notice"><b>Prototype, not advice.</b> Tested against past prices, this model does not beat the simplest method, which is to assume the price stays where it is. <a href="proof-of-work.html">Read the full test results.</a></p>
+
+  <h2>Track record in this district</h2>
+  <section id="record" aria-live="polite"></section>
 
   <h2>Price history</h2>
   <section id="history"></section>
 
-  <h2>When are prices usually high and low?</h2>
+  <h2>Usual prices through the year</h2>
   <section id="calendar"></section>
 
   <footer>
-    <p><a href="proof-of-work.html">Proof of Work (web page)</a> &middot; <a href="NESFIC-D-35-Proof-of-Work.pdf">Proof of Work (PDF)</a> &middot; <a href="farmer.html">Farmer advice page</a><span id="repo"></span></p>
-    <p>Data: AGMARKNET, Ministry of Agriculture and Farmers Welfare, Government of India, through data.gov.in ("Variety-wise Daily Market Prices Data of Commodity"), under the Government Open Data License - India. History was taken from a public bulk copy compiled by Manas Khandelwal (DOI 10.34740/kaggle/dsv/15888319). Prices are weekly medians of the daily modal price, in rupees per quintal (100 kg).</p>
-    <p id="built"></p>
+    <ul>
+      <li><a href="proof-of-work.html">Proof of Work</a></li>
+      <li><a href="NESFIC-D-35-Proof-of-Work.pdf">Proof of Work as PDF</a></li>
+      <li><a href="farmer.html">Farmer advice page</a></li>
+      <li id="repo" hidden><a>Code on GitHub</a></li>
+    </ul>
+    <p class="small">Prices: AGMARKNET, Ministry of Agriculture and Farmers Welfare, Government of India, through data.gov.in ("Variety-wise Daily Market Prices Data of Commodity"), under the Government Open Data License - India. History comes from a public bulk copy compiled by Manas Khandelwal (DOI 10.34740/kaggle/dsv/15888319). A price here is the weekly median of the daily modal price, in rupees per quintal (100 kg).</p>
+    <p class="small" id="built"></p>
   </footer>
 </main>
 
@@ -74,107 +145,199 @@
 (function () {
   const W = window.WEEKLY, D = window.D35, $ = id => document.getElementById(id);
   const R = new Map(W.ref.series);
-  const C = { a: '#257de0', r: '#f47230', text: '#191919', text2: '#666666', grid: '#e7e7e7' };
+  const C = { a: '#257de0', r: '#f47230', ink: '#14211D', ink2: '#55625C', line: '#D5DCD6', yellow: '#FFD23F' };
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const ADVICE = { HOLD: 'Hold or store if you can', SELL: 'Sell now', 'NO CLEAR SIGNAL': 'No clear signal' };
   const VW = 720, PAD = { l: 52, r: 78, t: 16, b: 30 };
   const rs = v => 'Rs ' + Math.round(v).toLocaleString('en-IN');
   const dt = w => D.weekStart(w).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const weeks = h => h + (h > 1 ? ' weeks' : ' week');
-  const txt = (x, y, s, anchor, fill) => `<text x="${x}" y="${y}" font-size="11" fill="${fill || C.text2}" text-anchor="${anchor || 'start'}">${esc(s)}</text>`;
-  const niceMax = v => { const p = Math.pow(10, Math.floor(Math.log10(v))), m = v / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; };
-  const tests = {}; // the test against history is worked out once per district
+  const wk = h => h + (h > 1 ? ' weeks' : ' week');
+  const pct = (v, d) => Math.abs(v).toFixed(d == null ? 1 : d) + '%';
+  const txt = (x, y, s, anchor, fill, size) => `<text x="${x}" y="${y}" font-size="${size || 11}" fill="${fill || C.ink2}" text-anchor="${anchor || 'start'}">${esc(s)}</text>`;
+  const niceStep = v => { const p = Math.pow(10, Math.floor(Math.log10(v))), m = v / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; };
+  const isCall = p => Math.abs(p.model / p.base - 1) >= 0.05; // the model calls hold or sell at 5% or more
+  const mean = a => a.reduce((s, v) => s + v, 0) / a.length;
+  const miss = (pts, k) => mean(pts.map(p => 100 * Math.abs(p[k] - p.actual) / p.actual));
+  const score = pts => { const calls = pts.filter(isCall); return { n: pts.length, naive: miss(pts, 'naive'), model: miss(pts, 'model'), calls: calls.length, right: calls.filter(p => Math.sign(p.model - p.base) === Math.sign(p.actual - p.base)).length, moved: pts.filter(p => Math.abs(p.actual / p.base - 1) >= 0.05).length }; };
 
-  function card(name, A, h) {
-    const lastA = Math.max(...A.keys());
-    let f = D.forecastLatest(A, R, h), stale = false;
-    if (f.noRecentPrice) { stale = true; f = D.forecastLatest(A, new Map([...R].filter(([w]) => w <= lastA)), h); }
-    const pct = Math.abs(f.changePct).toFixed(1);
-    const why = f.advice === 'HOLD' ? `The price is expected to rise about ${pct}% in ${weeks(h)}. Holding makes sense only if storage and spoilage cost less than that.`
-      : f.advice === 'SELL' ? `The price is expected to fall about ${pct}% in ${weeks(h)}.`
-        : `The price is expected to change by only ${f.changePct.toFixed(1)}% in ${weeks(h)}, which is too small to act on.`;
-    $('card').innerHTML = `<div class="card">
-      <div class="card-top"><span>Potato &middot; ${esc(name)} district, Assam</span><span>Week of ${dt(f.originWeek)}</span></div>
-      ${stale ? `<p class="warn">We hold no price for this district after the week of ${dt(lastA)}. A forecast needs a price from the last 4 weeks, so today the system would say "no recent price". The forecast below is as it stood in that week.${name === W.lead ? '' : ' Outside ' + esc(W.lead) + ' we downloaded only part of the newest records, so this gap may be ours and not the market\'s.'}</p>` : ''}
-      <div class="grid">
-        <div><small>Price ${stale ? 'that week' : 'now'}</small><b>${rs(f.base)}</b><small>per quintal${f.ageWeeks ? ', reported ' + weeks(f.ageWeeks) + ' earlier' : ''}</small></div>
-        <div><small>In ${weeks(h)} (week of ${dt(f.week)})</small><b>${rs(f.point)}</b><small>likely between ${rs(f.lo)} and ${rs(f.hi)}</small></div>
-        <div class="advice"><small>What the model says</small><b>${ADVICE[f.advice]}</b></div>
+  const state = { name: W.lead, h: 4, i: 0 }; // i indexes the past forecasts; i === past().length means the latest week
+  const cache = {};
+  // Every forecast the model would have made over this district's whole record, each using only earlier data.
+  function district(name) {
+    if (cache[name]) return cache[name];
+    const A = new Map(W.districts[name]), ks = [...A.keys()], first = Math.min(...ks), last = Math.max(...ks);
+    const whole = D.backtest(A, R, { horizons: [1, 2, 4], testWeeks: last - first + 1, refitEvery: 26 }), past = {};
+    // Until the model has 10 past examples it only repeats the last price, and its range has no width. Those first weeks are left out.
+    for (const h of [1, 2, 4]) past[h] = whole[h].points.filter(p => p.hi > p.lo);
+    return cache[name] = { A, last, past, recent: D.backtest(A, R, { horizons: [1, 2, 4], testWeeks: 156, refitEvery: 26 }) }; // recent: the test reported in the Proof of Work
+  }
+  const past = () => district(state.name).past[state.h];
+
+  // The forecast on show: a past week (with its outcome) or the latest week.
+  function view() {
+    const d = district(state.name), pts = past(), h = state.h;
+    if (state.i < pts.length) {
+      const p = pts[state.i];
+      return { origin: p.week - h, target: p.week, base: p.base, point: p.model, lo: p.lo, hi: p.hi, change: 100 * (p.model / p.base - 1), actual: p.actual, latest: false };
+    }
+    let f = D.forecastLatest(d.A, R, h), quiet = false;
+    if (f.noRecentPrice) { quiet = true; f = D.forecastLatest(d.A, new Map([...R].filter(e => e[0] <= d.last)), h); }
+    return { origin: f.originWeek, target: f.week, base: f.base, point: f.point, lo: f.lo, hi: f.hi, change: f.changePct, actual: null, latest: true, quiet, age: f.ageWeeks };
+  }
+
+  function reading(c, h) {
+    if (c >= 5) return ['The model says hold, or store if you can', `It expects the price to rise about ${pct(c)} in ${wk(h)}. Holding pays only if storage and spoilage cost you less than that.`];
+    if (c <= -5) return ['The model says sell now', `It expects the price to fall about ${pct(c)} in ${wk(h)}.`];
+    const tail = ' That is too small to act on. The model calls hold or sell only when it expects a move of 5% or more.';
+    if (c >= 2) return ['Leaning higher, but not a hold call', `It expects the price to rise about ${pct(c)} in ${wk(h)}.` + tail];
+    if (c <= -2) return ['Leaning lower, but not a sell call', `It expects the price to fall about ${pct(c)} in ${wk(h)}.` + tail];
+    return ['About the same price expected', `It expects the price to move less than 2% in ${wk(h)}.` + tail];
+  }
+
+  // A price scale: the band is the range the model expects, the yellow bar its forecast, the pin today's price.
+  function ruler(v) {
+    const vals = [v.base, v.lo, v.hi, v.point].concat(v.actual == null ? [] : [v.actual]);
+    let lo = Math.min(...vals), hi = Math.max(...vals); const pad = Math.max((hi - lo) * 0.14, hi * 0.03); lo -= pad; hi += pad;
+    const X = p => 20 + 440 * (p - lo) / (hi - lo), clamp = x => Math.max(48, Math.min(432, x)), step = niceStep((hi - lo) / 5);
+    let ticks = '';
+    for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks += `<line x1="${X(t)}" x2="${X(t)}" y1="84" y2="91" stroke="rgba(255,255,255,.5)"/>` + txt(X(t), 106, t.toLocaleString('en-IN'), 'middle', 'rgba(255,255,255,.74)', 12);
+    const now = X(v.base), fc = X(v.point);
+    const actual = v.actual == null ? '' : `<circle cx="${X(v.actual)}" cy="66" r="8" fill="#16382F" stroke="#fff" stroke-width="3"/>` + txt(clamp(X(v.actual)), 36, 'what happened', 'middle', '#fff', 12) + `<line x1="${X(v.actual)}" x2="${X(v.actual)}" y1="40" y2="56" stroke="#fff"/>`;
+    return `<svg class="ruler" viewBox="0 0 480 112" role="img" aria-label="Price scale. Price ${v.latest ? 'now' : 'that week'} ${rs(v.base)}. Forecast ${rs(v.point)}, likely between ${rs(v.lo)} and ${rs(v.hi)}.${v.actual == null ? '' : ' What happened: ' + rs(v.actual) + '.'}">
+      <line x1="20" x2="460" y1="84" y2="84" stroke="rgba(255,255,255,.5)"/>${ticks}
+      <rect x="${X(v.lo)}" y="54" width="${Math.max(2, X(v.hi) - X(v.lo))}" height="24" rx="5" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.6)"/>
+      <rect x="${fc - 2.5}" y="48" width="5" height="36" rx="2" fill="${C.yellow}"/>
+      <path d="M${now - 7} 44 L${now + 7} 44 L${now} 54 Z" fill="#fff"/><line x1="${now}" x2="${now}" y1="54" y2="84" stroke="#fff" stroke-width="1.5"/>
+      ${txt(clamp(now), 18, v.latest ? 'price now' : 'price that week', 'middle', '#fff', 12)}<line x1="${now}" x2="${now}" y1="22" y2="44" stroke="#fff"/>
+      ${actual}
+    </svg>`;
+  }
+
+  function board() {
+    const v = view(), h = state.h, d = district(state.name), [head, why] = reading(v.change, h);
+    let outcome = '';
+    if (v.actual != null) {
+      const moved = 100 * (v.actual / v.base - 1), inside = v.actual >= v.lo && v.actual <= v.hi;
+      const dir = Math.abs(moved) < 2 && Math.abs(v.change) < 2 ? 'Forecast and outcome were both close to flat.'
+        : Math.sign(moved) === Math.sign(v.change) ? 'The model had the direction right.' : 'The model had the direction wrong.';
+      outcome = `<div class="outcome"><p><b>What happened:</b> ${rs(v.actual)} in the week of ${dt(v.target)}, ${Math.abs(moved) < 0.05 ? 'no change' : pct(moved) + (moved > 0 ? ' up' : ' down')}.</p>
+        <p>${dir} The price landed <b>${inside ? 'inside' : 'outside'}</b> the range the model gave.</p></div>`;
+    }
+    const quiet = v.quiet ? `<p class="flag">No price is on record for this district after the week of ${dt(d.last)}. A forecast needs a price from the last 4 weeks, so today the system would say "no recent price". This is the forecast as it stood that week.${state.name === W.lead ? '' : ' Outside ' + esc(W.lead) + ' only part of the newest records were downloaded, so the gap may be ours and not the market\'s.'}</p>` : '';
+    $('board').innerHTML = `
+      <div class="board-head"><span class="crop-as" lang="as" aria-hidden="true">আলু</span><b>Potato in ${esc(state.name)}${state.name === W.lead ? ' (Guwahati area)' : ''}</b><time>Week of ${dt(v.origin)}</time></div>
+      ${quiet}
+      <div class="prices">
+        <div><small>${v.latest && !v.quiet ? 'Price now' : 'Price that week'}</small><strong>${rs(v.base)}</strong><small>per quintal${v.age ? ', reported ' + wk(v.age) + ' earlier' : ''}</small></div>
+        <div class="then"><small>Forecast for ${wk(h)} later</small><strong>${rs(v.point)}</strong><small>likely between ${rs(v.lo)} and ${rs(v.hi)}</small></div>
       </div>
+      ${ruler(v)}
+      <p class="key">Yellow bar: the forecast. Shaded band: the range the model expects.</p>
+      <p class="reading">${head}</p>
       <p>${why}</p>
-    </div>`;
+      ${outcome}`;
   }
 
-  function accuracy(name, A, h) {
-    const bt = tests[name] || (tests[name] = D.backtest(A, R, { horizons: [1, 2, 4], testWeeks: 156, refitEvery: 26 }));
-    const verdict = b => { const g = 100 * (1 - b.mape.model / b.mape.naive); return Math.abs(g) < 1 ? 'about the same' : g > 0 ? g.toFixed(1) + '% lower error' : (-g).toFixed(1) + '% higher error'; };
-    const rows = [1, 2, 4].map(k => { const b = bt[k]; return `<tr class="${k === h ? 'on' : ''}"><td>${weeks(k)} ahead</td><td>${b.n}</td>` + (b.mape ? `<td>${b.mape.naive.toFixed(1)}%</td><td>${b.mape.model.toFixed(1)}%</td><td>${verdict(b)}</td>` : '<td colspan="3">too few test weeks to score (30 needed)</td>') + '</tr>'; }).join('');
-    const b = bt[h];
-    $('accuracy').innerHTML = `<p>${b.mape ? `Tested on this district's last 156 weeks of data: at ${weeks(h)} ahead, over ${b.n} test forecasts, the model was off by ${b.mape.model.toFixed(1)}% on average. Assuming the price stays the same was off by ${b.mape.naive.toFixed(1)}%.` : `This district has only ${b.n} usable test forecasts at ${weeks(h)} ahead in its last 156 weeks of data. We do not report an error rate on fewer than 30.`}</p>
-      <div class="scroll"><table><thead><tr><th>Looking ahead</th><th>Test forecasts</th><th>Price stays the same</th><th>Model</th><th>Model against that</th></tr></thead><tbody>${rows}</tbody></table></div>
-      <p class="note">Each test forecast used only the data available at the time. Error is the average gap between forecast and actual price, as a share of the actual price.</p>`;
+  function travel() {
+    const pts = past(), s = $('week');
+    s.max = pts.length; s.value = state.i;
+    s.setAttribute('aria-valuetext', 'Week of ' + dt(view().origin));
+    const before = pts.slice(0, state.i).map(isCall).lastIndexOf(true), after = pts.findIndex((p, k) => k > state.i && isCall(p));
+    $('prevSig').disabled = before < 0; $('nextSig').disabled = after < 0;
+    $('prev').disabled = state.i === 0; $('next').disabled = $('latest').disabled = state.i >= pts.length;
+    $('prevSig').onclick = () => go(before); $('nextSig').onclick = () => go(after);
+  }
+  function go(i) { state.i = Math.max(0, Math.min(past().length, i)); board(); travel(); mark(); }
+
+  function record() {
+    const d = district(state.name), h = state.h, s = score(d.past[h]), r = d.recent[h];
+    const share = (a, b) => Math.round(100 * a / b) + '%';
+    const row = k => {
+      const q = score(d.past[k]), on = k === h ? ' class="on"' : '';
+      if (q.n < 30) return `<tr${on}><td>${wk(k)}</td><td>${q.n}</td><td colspan="4">too few past forecasts to score (30 needed)</td></tr>`;
+      return `<tr${on}><td>${wk(k)}</td><td>${q.n}</td><td>${q.naive.toFixed(1)}%</td><td>${q.model.toFixed(1)}%</td><td>${q.calls} (${share(q.calls, q.n)})</td><td>${q.calls ? share(q.right, q.calls) : 'none made'}</td></tr>`;
+    };
+    const lead = s.n < 30 ? `This district has only ${s.n} past forecasts at ${wk(h)} ahead. That is too few to judge the model here.`
+      : `Looking ${wk(h)} ahead, the model would have made ${s.n} forecasts over this district's price record. Its average miss was ${s.model.toFixed(1)}%, against ${s.naive.toFixed(1)}% for assuming the price stays the same. It called hold or sell in ${s.calls} of them (${share(s.calls, s.n)})${s.calls ? ' and had the direction right in ' + share(s.right, s.calls) + ' of those calls' : ''}. The price itself moved 5% or more in ${share(s.moved, s.n)} of those weeks.`;
+    $('record').innerHTML = `<p>${lead}</p>
+      <div class="scroll"><table><thead><tr><th>Looking ahead</th><th>Past forecasts</th><th>Miss if price stays the same</th><th>Model's miss</th><th>Hold or sell calls</th><th>Direction right</th></tr></thead><tbody>${[1, 2, 4].map(row).join('')}</tbody></table></div>
+      <p class="small">A miss is the average gap between forecast and actual price, as a share of the actual price. Lower is better. Each past forecast used only the prices known at the time. The first weeks of each record are left out, because the model needs some history before it can be fitted.</p>
+      <p class="small">${r.mape ? `The Proof of Work reports a shorter, more recent test: the last 156 weeks only. There, at ${wk(h)} ahead over ${r.n} forecasts, the model missed by ${r.mape.model.toFixed(1)}% and "the price stays the same" by ${r.mape.naive.toFixed(1)}%.` : `The Proof of Work reports a shorter, more recent test: the last 156 weeks only. This district has just ${r.n} forecasts in that window at ${wk(h)} ahead, too few to score.`}</p>`;
   }
 
-  function history(name, A) {
-    const H = 260, w1 = Math.max(Math.max(...A.keys()), Math.max(...R.keys())), w0 = Math.max(Math.min(...A.keys()), w1 - 52 * 12);
-    const inView = S => [...S].filter(([w]) => w >= w0);
-    const a = inView(A), r = inView(R), max = niceMax(Math.max(...a.map(p => p[1]), ...r.map(p => p[1]), 1));
+  let chart = null; // scale of the history chart, so the chosen week can be marked on it
+  function history() {
+    const d = district(state.name), A = d.A, H = 260, w1 = Math.max(d.last, Math.max(...R.keys())), w0 = Math.max(Math.min(...A.keys()), w1 - 52 * 12);
+    const inView = S => [...S].filter(e => e[0] >= w0), a = inView(A), r = inView(R);
+    const max = niceStep(Math.max(...a.map(p => p[1]), ...r.map(p => p[1]), 1) / 4) * 4;
     const x = w => PAD.l + (VW - PAD.l - PAD.r) * (w - w0) / (w1 - w0), y = v => PAD.t + (H - PAD.t - PAD.b) * (1 - v / max);
-    const line = (pts, c) => { let d = '', prev = null; for (const [w, v] of pts) { d += (prev == null || w - prev > 3 ? 'M' : 'L') + x(w).toFixed(1) + ' ' + y(v).toFixed(1); prev = w; } return `<path d="${d}" fill="none" stroke="${c}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`; };
+    const line = (pts, c) => { let p = '', prev = null; for (const e of pts) { p += (prev == null || e[0] - prev > 3 ? 'M' : 'L') + x(e[0]).toFixed(1) + ' ' + y(e[1]).toFixed(1); prev = e[0]; } return `<path d="${p}" fill="none" stroke="${c}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`; };
     let g = '';
-    for (let i = 0; i <= 4; i++) { const v = max * i / 4; g += `<line x1="${PAD.l}" x2="${VW - PAD.r}" y1="${y(v)}" y2="${y(v)}" stroke="${C.grid}"/>` + txt(PAD.l - 6, y(v) + 4, v.toLocaleString('en-IN'), 'end'); }
+    for (let i = 0; i <= 4; i++) { const v = max * i / 4; g += `<line x1="${PAD.l}" x2="${VW - PAD.r}" y1="${y(v)}" y2="${y(v)}" stroke="${C.line}"/>` + txt(PAD.l - 6, y(v) + 4, v.toLocaleString('en-IN'), 'end'); }
     for (let yr = D.weekStart(w0).getUTCFullYear() + 1; yr <= D.weekStart(w1).getUTCFullYear(); yr++) { const w = D.weekIndex(new Date(Date.UTC(yr, 0, 1))); if (w > w0 && yr % 2 === 0) g += txt(x(w), H - 10, yr, 'middle'); }
-    const end = (pts, label) => pts.length ? txt(x(pts[pts.length - 1][0]) + 6, y(pts[pts.length - 1][1]) + 4, label, 'start', C.text) : '';
-    $('history').innerHTML = `<div class="legend"><span><i style="background:${C.a}"></i>${esc(name)} district</span><span><i style="background:${C.r}"></i>Siliguri, West Bengal (comparison market)</span></div>
-      <div class="chart"><svg viewBox="0 0 ${VW} ${H}" role="img" aria-label="Weekly potato price in ${esc(name)} and Siliguri">${g}${txt(PAD.l, 11, 'Rs per quintal')}${line(r, C.r)}${line(a, C.a)}${end(r, 'Siliguri')}${end(a, name)}<line class="cross" y1="${PAD.t}" y2="${H - PAD.b}" stroke="${C.text2}" stroke-dasharray="3 3" style="display:none"/></svg><div class="tip"></div></div>
-      <p class="note">Breaks in a line are weeks with no price report. Move over the chart to read the prices for a week.</p>`;
+    const end = (pts, label, dy) => pts.length ? txt(x(pts[pts.length - 1][0]) + 6, y(pts[pts.length - 1][1]) + 4 + dy, label, 'start', C.ink) : '';
+    const close = a.length && r.length && Math.abs(y(a[a.length - 1][1]) - y(r[r.length - 1][1])) < 12 ? (a[a.length - 1][1] > r[r.length - 1][1] ? -7 : 7) : 0;
+    $('history').innerHTML = `<div class="legend"><span><i style="background:${C.a}"></i>${esc(state.name)} district</span><span><i style="background:${C.r}"></i>Siliguri, West Bengal (comparison market)</span></div>
+      <div class="chart"><svg viewBox="0 0 ${VW} ${H}" role="img" aria-label="Weekly potato price in ${esc(state.name)} and Siliguri">${g}${txt(PAD.l, 11, 'Rs per quintal')}${line(r, C.r)}${line(a, C.a)}${end(r, 'Siliguri', -close)}${end(a, state.name, close)}
+        <line class="mark" y1="${PAD.t}" y2="${H - PAD.b}" stroke="${C.ink}" stroke-width="1.5" style="display:none"/><line class="cross" y1="${PAD.t}" y2="${H - PAD.b}" stroke="${C.ink2}" stroke-dasharray="3 3" style="display:none"/></svg><div class="tip"></div></div>
+      <p class="small">A break in a line is a week with no price report. The solid upright line marks the week chosen above. Move over the chart to read a week's prices.</p>`;
+    chart = { x, w0, w1 };
     const svg = $('history').querySelector('svg'), tip = $('history').querySelector('.tip'), cross = svg.querySelector('.cross');
     const hide = () => { tip.style.display = 'none'; cross.style.display = 'none'; };
     svg.addEventListener('pointerleave', hide);
     svg.addEventListener('pointermove', e => {
       const box = svg.getBoundingClientRect(), px = (e.clientX - box.left) / box.width * VW;
       if (px < PAD.l || px > VW - PAD.r) return hide();
-      const w = Math.round(w0 + (px - PAD.l) / (VW - PAD.l - PAD.r) * (w1 - w0));
-      const at = S => S.has(w) ? rs(S.get(w)) : 'no report';
+      const w = Math.round(w0 + (px - PAD.l) / (VW - PAD.l - PAD.r) * (w1 - w0)), at = S => S.has(w) ? rs(S.get(w)) : 'no report';
       cross.setAttribute('x1', x(w)); cross.setAttribute('x2', x(w)); cross.style.display = '';
-      tip.innerHTML = `<b>Week of ${dt(w)}</b><br><i style="background:${C.a}"></i>${esc(name)}: ${at(A)}<br><i style="background:${C.r}"></i>Siliguri: ${at(R)}`;
+      tip.innerHTML = `<b>Week of ${dt(w)}</b><br><i style="background:${C.a}"></i>${esc(state.name)}: ${at(A)}<br><i style="background:${C.r}"></i>Siliguri: ${at(R)}`;
       tip.style.display = 'block';
       tip.style.left = Math.max(0, Math.min(box.width - tip.offsetWidth, e.clientX - box.left + 12)) + 'px';
     });
+    mark();
+  }
+  function mark() {
+    const m = $('history').querySelector('.mark'); if (!m || !chart) return;
+    const w = view().origin, on = w >= chart.w0 && w <= chart.w1;
+    m.style.display = on ? '' : 'none';
+    if (on) { m.setAttribute('x1', chart.x(w)); m.setAttribute('x2', chart.x(w)); }
   }
 
-  function calendar(name, A) {
-    const cal = D.seasonCalendar(A);
+  function calendar() {
+    const cal = D.seasonCalendar(district(state.name).A);
     if (cal.some(m => m.index == null)) { $('calendar').innerHTML = '<p>There are not enough complete years of prices for this district to say.</p>'; return; }
     const H = 200, lo = Math.floor(Math.min(...cal.map(m => m.lo)) * 10) / 10, hi = Math.ceil(Math.max(...cal.map(m => m.hi)) * 10) / 10;
     const y = v => PAD.t + (H - PAD.t - PAD.b) * (1 - (v - lo) / (hi - lo)), slot = (VW - PAD.l - PAD.r) / 12;
     let g = '';
-    for (let v = lo; v <= hi + 1e-9; v += 0.1) g += `<line x1="${PAD.l}" x2="${VW - PAD.r}" y1="${y(v)}" y2="${y(v)}" stroke="${Math.abs(v - 1) < 1e-9 ? C.text2 : C.grid}"/>` + (Math.round(v * 10) % 2 === 0 ? txt(PAD.l - 6, y(v) + 4, Math.round(v * 100) + '%', 'end') : '');
+    for (let v = lo; v <= hi + 1e-9; v += 0.1) g += `<line x1="${PAD.l}" x2="${VW - PAD.r}" y1="${y(v)}" y2="${y(v)}" stroke="${Math.abs(v - 1) < 1e-9 ? C.ink2 : C.line}"/>` + (Math.round(v * 10) % 2 === 0 ? txt(PAD.l - 6, y(v) + 4, Math.round(v * 100) + '%', 'end') : '');
     const marks = cal.map((m, i) => { const cx = PAD.l + slot * i + slot / 2; return `<g><title>${MONTHS[i]}: usually ${Math.round(m.index * 100)}% of the year's typical price (middle half of years: ${Math.round(m.lo * 100)}% to ${Math.round(m.hi * 100)}%; ${m.years} years)</title><rect x="${cx - slot / 2}" y="${PAD.t}" width="${slot}" height="${H - PAD.t - PAD.b}" fill="transparent"/><line x1="${cx}" x2="${cx}" y1="${y(m.hi)}" y2="${y(m.lo)}" stroke="${C.a}" stroke-width="2" stroke-linecap="round"/><circle cx="${cx}" cy="${y(m.index)}" r="5" fill="${C.a}" stroke="#fff" stroke-width="2"/></g>` + txt(cx, H - 10, MONTHS[i], 'middle'); }).join('');
-    const top = [...cal].sort((p, q) => q.index - p.index).slice(0, 3), low = [...cal].sort((p, q) => p.index - q.index).slice(0, 3);
-    const names = l => l.map(m => MONTHS[m.month - 1]).join(', ');
-    $('calendar').innerHTML = `<p>In a typical year, potato prices in ${esc(name)} are highest in <b>${names(top)}</b> and lowest in <b>${names(low)}</b>. Based on ${Math.min(...cal.map(m => m.years))} to ${Math.max(...cal.map(m => m.years))} years of prices per month.</p>
-      <div class="chart"><svg viewBox="0 0 ${VW} ${H}" role="img" aria-label="Typical price by month in ${esc(name)}">${g}${marks}${txt(VW - PAD.r + 6, y(1) + 4, 'typical price')}</svg></div>
+    const top = [...cal].sort((p, q) => q.index - p.index).slice(0, 3), low = [...cal].sort((p, q) => p.index - q.index).slice(0, 3), names = l => l.map(m => MONTHS[m.month - 1]).join(', ');
+    $('calendar').innerHTML = `<p>In a typical year, potato prices in ${esc(state.name)} are highest in <b>${names(top)}</b> and lowest in <b>${names(low)}</b>. This is the stronger pattern in the data, and it rests on ${Math.min(...cal.map(m => m.years))} to ${Math.max(...cal.map(m => m.years))} years of prices per month.</p>
+      <div class="chart"><svg viewBox="0 0 ${VW} ${H}" role="img" aria-label="Typical price by month in ${esc(state.name)}">${g}${marks}${txt(VW - PAD.r + 6, y(1) + 4, 'typical price')}</svg></div>
       <div class="scroll"><table><thead><tr>${MONTHS.map(m => `<th>${m}</th>`).join('')}</tr></thead><tbody><tr>${cal.map(m => `<td>${Math.round(m.index * 100)}%</td>`).join('')}</tr></tbody></table></div>
-      <p class="note">Each dot is the usual price in that month as a share of the year's typical price. The bar covers the middle half of the years on record. This describes past seasons. It is not a forecast of next year.</p>`;
+      <p class="small">Each dot is the usual price in that month as a share of the year's typical price. The bar covers the middle half of the years on record. It describes past seasons and is not a forecast of next year.</p>`;
   }
 
-  const sel = $('district'), hor = $('horizon');
+  const sel = $('district');
   Object.keys(W.districts).sort().forEach(n => sel.add(new Option(n === W.lead ? n + ' (Guwahati area)' : n, n)));
-  sel.value = W.lead;
-  function render(all) {
-    const name = sel.value, h = +hor.value, A = new Map(W.districts[name]);
-    card(name, A, h); accuracy(name, A, h);
-    if (all) { history(name, A); calendar(name, A); } // these two do not depend on the look-ahead
-  }
-  sel.addEventListener('change', () => render(true));
-  hor.addEventListener('change', () => render(false));
-  render(true);
+  sel.value = state.name;
+  sel.addEventListener('change', () => { state.name = sel.value; state.i = past().length; board(); travel(); record(); history(); calendar(); });
+  $('horizon').addEventListener('change', e => {
+    const origin = view().origin, wasLatest = state.i >= past().length;
+    state.h = +e.target.value;
+    const k = past().findIndex(p => p.week - state.h >= origin); // stay on the same week where the new look-ahead has one
+    state.i = wasLatest || k < 0 ? past().length : k;
+    board(); travel(); record(); mark();
+  });
+  $('week').addEventListener('input', e => go(+e.target.value));
+  $('prev').onclick = () => go(state.i - 1); $('next').onclick = () => go(state.i + 1); $('latest').onclick = () => go(past().length);
+
+  state.i = past().length;
+  board(); travel(); record(); history(); calendar();
 
   $('built').textContent = 'Prices last updated ' + new Date(W.generatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) + '.';
   const host = location.hostname.match(/^([^.]+)\.github\.io$/), repo = location.pathname.split('/')[1];
-  if (host && repo) $('repo').innerHTML = ` &middot; <a href="https://github.com/${esc(host[1])}/${esc(repo)}">Code on GitHub</a>`;
+  if (host && repo) { $('repo').hidden = false; $('repo').firstChild.href = 'https://github.com/' + host[1] + '/' + repo; }
 })();
 </script>
 </body>
