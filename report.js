@@ -138,6 +138,9 @@ function calendarSummary() {
 }
 
 const CSS = `
+.shot{display:block;width:100%;border:1px solid #cfcfcf;border-radius:6px}
+.shots{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;break-inside:avoid}.shots figure{margin:6px 0}
+table.long{break-inside:auto}table.long tr{break-inside:avoid}
 *{box-sizing:border-box} body{font:13px/1.5 "Segoe UI",system-ui,Arial,sans-serif;color:${C.text};margin:0;background:#fff}
 main{max-width:780px;margin:0 auto;padding:24px 16px} h1{font-size:24px;margin:0 0 4px} h2{font-size:17px;margin:26px 0 8px;padding-top:10px;border-top:2px solid ${C.text};break-after:avoid} h3{font-size:14px;margin:16px 0 6px;break-after:avoid}
 p{margin:6px 0} .sub{color:${C.text2}} .note{color:${C.text2};font-size:12px} .warn{background:#fff6e0;border-left:3px solid ${C.s4};padding:6px 10px}
@@ -171,6 +174,45 @@ const cov = [1, 2, 4].map(h => b[h].coverage80Pct).filter(v => v != null);
 const rangeText = !cov.length ? '' : Math.min(...cov) >= 75 ? `The stated range held ${num(Math.min(...cov), 0)}% to ${num(Math.max(...cov), 0)}% of the time, close to the 80% intended.` : `The stated range held ${num(Math.min(...cov), 0)}% to ${num(Math.max(...cov), 0)}% of the time, below the 80% intended, so it is too narrow and needs recalibrating.`;
 const verdict = h => !b[h].mape ? 'could not be measured' : b[h].improvementOverNaivePct > 0 ? `was ${num(b[h].improvementOverNaivePct)}% lower than the last-known-price baseline` : `was ${num(-b[h].improvementOverNaivePct)}% higher than the last-known-price baseline, so the model did not beat it`;
 
+// ---------- added sections: the whole-record replay, more crops, and the live web app
+const RP = R.replay, wks = h => `${h} week${h > 1 ? 's' : ''}`;
+const share = (a, n) => n ? Math.round(100 * a / n) + '%' : '-';
+const list = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a.join('');
+const replayRows = [['lead', 'Kamrup'], ['all', `All ${RP.Potato.districts} districts`]].flatMap(([k, label]) => [1, 2, 4].map(h => {
+  const x = RP.Potato[k]['h' + h];
+  return [label, wks(h), x.n.toLocaleString('en-IN'), num(x.naive) + '%', `<b>${num(x.model)}%</b>`, `${x.calls.toLocaleString('en-IN')} (${share(x.calls, x.n)})`, share(x.callsRight, x.calls), share(x.moved, x.n)];
+}));
+const behindAt = k => [1, 2, 4].filter(h => RP.Potato[k]['h' + h].model > RP.Potato[k]['h' + h].naive).map(wks);
+const replaySection = `
+<h3>The same model over the whole price record</h3>
+<p>The test above covers the last ${R.backtestSetup.testWeeks} weeks. As a second and harder check, the model was replayed over every week of each district's record, each time seeing only earlier weeks. The first weeks of a record are left out, because the model needs some history before it can be fitted. A "call" is a forecast move of 5% or more, which is when the model says hold or sell.</p>
+${table(['Potato', 'Looking ahead', 'Forecasts', 'Last known price', 'Our model', 'Hold or sell calls', 'Direction right in those calls', 'Weeks the price really moved 5% or more'], replayRows)}
+<p><b>Plain reading:</b> across all ${RP.Potato.districts} districts the model's miss is larger than the last known price at ${list(behindAt('all')) || 'no look-ahead'}. In Kamrup alone it is larger at ${list(behindAt('lead')) || 'no look-ahead'}${behindAt('lead').length < 3 ? ', and smaller at the rest' : ''}. So the wider test does not change the verdict: the prototype does not beat the simplest method. It also shows the model is not silent. At 4 weeks it makes a hold or sell call in ${share(RP.Potato.all.h4.calls, RP.Potato.all.h4.n)} of weeks and has the direction right in ${share(RP.Potato.all.h4.callsRight, RP.Potato.all.h4.calls)} of those calls.</p>`;
+
+const cropNames = Object.keys(RP), extraCrops = cropNames.filter(c => c !== 'Potato');
+const rel = (c, h) => RP[c].all['h' + h].model / RP[c].all['h' + h].naive - 1; // how far the model's miss is above (+) or below (-) the last known price
+const cropRows = cropNames.map(c => { const x = RP[c], one = x.all.h1, four = x.all.h4; return [
+  esc(c) + (x.comparisonMarket ? ' *' : ''), (x.records ?? R.data.assamRowsAll).toLocaleString('en-IN'), x.districts, x.leadWeeks ?? R.lead.weeksWithData,
+  one.n.toLocaleString('en-IN'), num(one.naive) + '%', `<b>${num(one.model)}%</b>`, four.n.toLocaleString('en-IN'), num(four.naive) + '%', `<b>${num(four.model)}%</b>`, share(four.callsRight, four.calls)]; });
+const ahead4 = cropNames.filter(c => rel(c, 4) <= -0.05), level4 = cropNames.filter(c => Math.abs(rel(c, 4)) < 0.02), behind1 = cropNames.filter(c => rel(c, 1) > 0);
+const st = R.survey.staples;
+const cropsSection = `
+<h3>The same method on ${extraCrops.length} more crops</h3>
+<p>To see whether the method carries beyond potato, the same code was run on ${list(extraCrops.map(c => c.toLowerCase()))}. Each uses its district's own price history and the season, with no comparison market. The figures are from the whole-record replay, over every district with 60 or more weeks of prices.</p>
+${table(['Crop', 'Records', 'Districts', 'Kamrup weeks with a price', '1 wk: forecasts', 'Last known', 'Model', '4 wk: forecasts', 'Last known', 'Model', 'Direction right in 4 wk calls'], cropRows)}
+<p class="note">* Potato is the only crop with a comparison market (Siliguri). Records are for all of Assam.</p>
+<p><b>Plain reading:</b> at 1 week the model's miss is larger than the last known price for ${behind1.length} of the ${cropNames.length} crops. At 4 weeks it is clearly smaller for ${list(ahead4.map(c => c.toLowerCase())) || 'none'}${level4.length ? `, about level for ${list(level4.map(c => c.toLowerCase()))}` : ''}, and larger for the rest. The crops where it helps are the most seasonal ones. Vegetable prices move far more than potato prices, so every method misses by more.</p>
+<p><b>What public data could not support.</b> For all of Assam, the newest public records (from late 2025) hold ${st.Paddy} price reports for paddy, ${st.Jute} for jute and ${st.Arecanut} for arecanut, as counted by the data.gov.in service on 25 Nov 2026. That is too few for a weekly price, so the State's staple and cash crops cannot be forecast from public data today. Mustard has ${st.Mustard} and was not attempted. Rice was left out: early in 2026 its reported Kamrup price roughly doubles within two weeks and then stays there, which reads as a change in what is being reported and not a market move.</p>
+<p class="note">These ${extraCrops.length} crops were run through the same code and the same checks, but were not studied in the depth potato was. Their newest records were downloaded for Kamrup only.</p>`;
+
+const shot = (file, alt, caption) => { const f = path.join(__dirname, 'out', file); return fs.existsSync(f) ? `<figure><img class="shot" alt="${esc(alt)}" src="data:image/png;base64,${fs.readFileSync(f).toString('base64')}"><figcaption>${caption}</figcaption></figure>` : ''; };
+const link = u => `<a href="${u}">${u.replace('https://', '')}</a>`;
+const webappSection = `
+<h3>The working web app</h3>
+<p>The prototype is live at ${link(R.links.demo)}. A visitor picks a crop, a district and a look-ahead of 1, 2 or 4 weeks. The forecast is worked out in the visitor's browser by the same code that produced this document, and the build fails if the two disagree. Every past week can be replayed to see what the model said then and what the price did next. Code and data: ${link(R.links.code)}.</p>
+<div class="shots">${shot('webapp-latest.png', 'The web app showing the latest potato forecast for Kamrup', 'Screenshot A. The live web app: the latest potato forecast for Kamrup, with the price now, the forecast, its range and the reading.')}
+${shot('webapp-past.png', 'The web app showing a past week for another crop with what happened next', 'Screenshot B. A past week replayed for another crop: what the model said, and what the price then did.')}</div>`;
+
 fs.writeFileSync(path.join(__dirname, 'out', 'proof-of-work.html'), page('NESFIC-D-35 Proof of Work', `
 <h1>Proof of Work: price forecasting for Assam farmers</h1>
 <p class="sub">NESFIC 2026 &middot; Challenge NESFIC-D-35, Agricultural Commodity Price Intelligence and Forecasting for Farmer Decisions &middot; ${esc(TEAM)} &middot; Generated ${date(R.generatedAt.slice(0, 10))}</p>
@@ -179,6 +221,7 @@ fs.writeFileSync(path.join(__dirname, 'out', 'proof-of-work.html'), page('NESFIC
 <p>A working prototype that forecasts wholesale potato prices in Assam 1, 2 and 4 weeks ahead from real public market data, tested against what actually happened, and turned into a plain hold-or-sell message for a farmer. Potato was chosen because it can be stored, so the hold-or-sell decision is real.</p>
 <p><b>What is real:</b> every number, table and chart in sections 2 to 6 was produced by the code listed in section 9 from public Agmarknet price records. No figure was typed in by hand. <b>What is not real yet:</b> the three screens in section 7 are design mock-ups, and nothing here uses data from the Department, the AMIU of Assam Agricultural University or any farmer. Limits are listed in section 8.</p>
 <p><b>Headline result, stated plainly:</b> ${R.pooled.h1 ? `across ${R.pooled.h1.districts} Assam districts and ${R.pooled.h1.n} test forecasts, the prototype's 1-week error is ${num(R.pooled.h1.model)}% against ${num(R.pooled.h1.naive)}% for simply repeating the last known price. It ties that baseline; it does not yet beat it.` : 'too few test weeks to score.'} The more useful findings are how incomplete the price record is (Figure 1), how weakly the Assam market tracks its nearest large market week to week (section 3), and a price calendar built on ${Math.max(...R.calendar.assam.map(m => m.years))} years of data (section 6).</p>
+<p><b>Live demo and code:</b> the prototype runs as a web app at ${link(R.links.demo)}, and the code and data are at ${link(R.links.code)}. Section 5 also reports the model replayed over the whole price record, and the same method on ${extraCrops.length} more crops. Section 6 shows the web app.</p>
 
 <h2>2. The data, and its gaps</h2>
 ${table(['', 'Assam market', 'Comparison market'], [
@@ -218,9 +261,11 @@ ${R.firstVersion ? `<p><b>One revision was made, and both results are shown.</b>
 <figure>${backtestChart()}<figcaption>Figure 4. Each forecast was made 4 weeks before the date it is plotted on.</figcaption></figure>
 <h3>The same test in other Assam districts</h3>
 <p>To check that the result is not special to one market, the identical procedure was run on every Assam district with potato prices, each against Siliguri. Districts with fewer than ${R.backtestSetup.minTestPoints} usable test weeks are listed but not scored.</p>
-${table(['District', 'Records', 'Weeks with data', 'Coverage', '1 wk: tests', 'Last known', 'Model', 'Better by', '4 wk: tests', 'Last known', 'Model', 'Better by'], distRows)}
+${table(['District', 'Records', 'Weeks with data', 'Coverage', '1 wk: tests', 'Last known', 'Model', 'Better by', '4 wk: tests', 'Last known', 'Model', 'Better by'], distRows, 'long')}
 ${R.districts.some(x => x.h1 && x.h1.naive < 2) ? `<p class="note">${R.districts.filter(x => x.h1 && x.h1.naive < 2).map(x => x.district).join(', ')}: the reported price there barely changes from week to week (the last known price is off by under 2%), so no method can improve on repeating it. The figures are kept in the table and in the totals below.</p>` : ''}
 ${R.pooled.h1 ? `<p><b>All scored districts together:</b> ${[1, 2, 4].filter(h => R.pooled['h' + h]).map(h => `at ${h} week${h > 1 ? 's' : ''}, ${R.pooled['h' + h].n.toLocaleString('en-IN')} forecasts, error ${num(R.pooled['h' + h].model)}% for the model against ${num(R.pooled['h' + h].naive)}% for the last known price`).join('; ')}.</p>` : ''}
+${replaySection}
+${cropsSection}
 
 <h2>6. What the farmer sees</h2>
 <p class="warn">This card shows the output format on real data. Because the model has not yet beaten the simple baseline (section 5), it is not yet advice a farmer should act on.</p>
@@ -230,6 +275,7 @@ ${farmerCard()}
 ${calendarSummary()}
 <figure>${calendarChart()}<figcaption>Figure 5. Each dot is the typical price in that month as a share of the year's typical price. The bar spans the middle half of the years observed.</figcaption></figure>
 ${table(['', ...MONTHS], [['Assam market', ...R.calendar.assam.map(m => m.index == null ? '-' : Math.round(m.index * 100) + '%')], ['Siliguri', ...R.calendar.ref.map(m => m.index == null ? '-' : Math.round(m.index * 100) + '%')]])}
+${webappSection}
 
 <h2>7. Planned screens <span class="tag">design mock-ups, not built</span></h2>
 <div class="wire">
@@ -251,8 +297,8 @@ ${table(['', ...MONTHS], [['Assam market', ...R.calendar.assam.map(m => m.index 
 
 <h2>8. Limits of this prototype</h2>
 <ul>
-<li>Accuracy: across the scored districts the model roughly ties the last-known-price method. It is a measured baseline, not a finished forecaster.</li>
-<li>One crop. The method is not tied to potato, but it has only been tested on potato.</li>
+<li>Accuracy: over the last ${R.backtestSetup.testWeeks} weeks the model roughly ties the last-known-price method, and over the whole record it does not beat it. It is a measured baseline, not a finished forecaster.</li>
+<li>Depth. Only potato has a comparison market and a full analysis. The ${extraCrops.length} other crops were run through the same code and checked less closely.</li>
 <li>Public Agmarknet prices only. AMIU's own daily prices and arrival quantities, which the Department names, were not available to us.</li>
 <li>The price is a weekly median across the markets of a district, so it hides differences between varieties and between markets.</li>
 <li>The 5% hold-or-sell threshold is a placeholder. The real figure depends on storage cost and spoilage, which must come from the Department and farmers.</li>
@@ -267,6 +313,7 @@ ${table(['Step', 'Command', 'What it does'], [
   ['2', '<code>node test.js</code>', `Runs ${R.checks || 14} self-checks on the cleaning and forecasting code`],
   ['3', '<code>node analyze.js</code>', 'Builds the weekly series, runs the tests against history, writes <code>out/results.json</code>'],
   ['4', '<code>node report.js</code>', 'Builds this document and the farmer page from <code>out/results.json</code>'],
+  ['5', '<code>node build-web.js</code>', 'Builds the web app from the same code and checks every crop, district and look-ahead'],
 ])}
-<p class="note">Code files: fetch.js, fetch-hf.js, series.js, model.js, test.js, analyze.js, report.js. Data attribution: AGMARKNET, Ministry of Agriculture and Farmers Welfare, Government of India, via data.gov.in; bulk copy compiled by Manas Khandelwal (DOI 10.34740/kaggle/dsv/15888319), hosted on Hugging Face.</p>`));
+<p class="note">Code files: fetch.js, fetch-hf.js, series.js, model.js, test.js, analyze.js, report.js, build-web.js. Data attribution: AGMARKNET, Ministry of Agriculture and Farmers Welfare, Government of India, via data.gov.in; bulk copy compiled by Manas Khandelwal (DOI 10.34740/kaggle/dsv/15888319), hosted on Hugging Face.</p>`));
 console.log('wrote out/farmer.html and out/proof-of-work.html');

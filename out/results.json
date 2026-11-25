@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-25T15:49:05.975Z",
+ "generatedAt": "2026-11-25T15:58:32.073Z",
  "checks": 14,
  "source": {
   "name": "Variety-wise Daily Market Prices Data of Commodity (Agmarknet), data.gov.in",
@@ -7406,5 +7406,496 @@
    "lo": 1139,
    "hi": 1715
   }
- ]
+ ],
+ "replay": {
+  "Potato": {
+   "districts": 19,
+   "comparisonMarket": true,
+   "all": {
+    "h1": {
+     "n": 6591,
+     "naive": 8.13,
+     "model": 9.07,
+     "calls": 1238,
+     "callsRight": 591,
+     "moved": 3229
+    },
+    "h2": {
+     "n": 6468,
+     "naive": 11.66,
+     "model": 12.78,
+     "calls": 2371,
+     "callsRight": 1289,
+     "moved": 3942
+    },
+    "h4": {
+     "n": 6269,
+     "naive": 17.64,
+     "model": 18.08,
+     "calls": 3598,
+     "callsRight": 2154,
+     "moved": 4604
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 870,
+     "naive": 7.71,
+     "model": 8.41,
+     "calls": 150,
+     "callsRight": 76,
+     "moved": 445
+    },
+    "h2": {
+     "n": 865,
+     "naive": 10.85,
+     "model": 10.94,
+     "calls": 273,
+     "callsRight": 167,
+     "moved": 531
+    },
+    "h4": {
+     "n": 855,
+     "naive": 16.7,
+     "model": 16.02,
+     "calls": 487,
+     "callsRight": 315,
+     "moved": 627
+    }
+   }
+  },
+  "Tomato": {
+   "districts": 13,
+   "comparisonMarket": false,
+   "records": 14126,
+   "droppedAsOutliers": 22,
+   "leadWeeks": 550,
+   "leadLastWeek": "2026-11-23",
+   "all": {
+    "h1": {
+     "n": 3105,
+     "naive": 16.42,
+     "model": 17.91,
+     "calls": 1200,
+     "callsRight": 584,
+     "moved": 2197
+    },
+    "h2": {
+     "n": 2994,
+     "naive": 24.33,
+     "model": 25.81,
+     "calls": 1814,
+     "callsRight": 979,
+     "moved": 2393
+    },
+    "h4": {
+     "n": 2826,
+     "naive": 37.11,
+     "model": 36.6,
+     "calls": 2156,
+     "callsRight": 1251,
+     "moved": 2438
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 508,
+     "naive": 14.6,
+     "model": 16.67,
+     "calls": 168,
+     "callsRight": 81,
+     "moved": 350
+    },
+    "h2": {
+     "n": 500,
+     "naive": 22.23,
+     "model": 23.85,
+     "calls": 294,
+     "callsRight": 155,
+     "moved": 401
+    },
+    "h4": {
+     "n": 485,
+     "naive": 33.61,
+     "model": 32.4,
+     "calls": 350,
+     "callsRight": 204,
+     "moved": 416
+    }
+   }
+  },
+  "Cabbage": {
+   "districts": 16,
+   "comparisonMarket": false,
+   "records": 13480,
+   "droppedAsOutliers": 8,
+   "leadWeeks": 554,
+   "leadLastWeek": "2026-11-23",
+   "all": {
+    "h1": {
+     "n": 2889,
+     "naive": 15.53,
+     "model": 16.58,
+     "calls": 1214,
+     "callsRight": 616,
+     "moved": 2017
+    },
+    "h2": {
+     "n": 2766,
+     "naive": 23.05,
+     "model": 23,
+     "calls": 1751,
+     "callsRight": 993,
+     "moved": 2151
+    },
+    "h4": {
+     "n": 2593,
+     "naive": 37.05,
+     "model": 32.6,
+     "calls": 2077,
+     "callsRight": 1270,
+     "moved": 2208
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 510,
+     "naive": 14.67,
+     "model": 15.83,
+     "calls": 152,
+     "callsRight": 74,
+     "moved": 343
+    },
+    "h2": {
+     "n": 499,
+     "naive": 21.28,
+     "model": 23.21,
+     "calls": 265,
+     "callsRight": 142,
+     "moved": 380
+    },
+    "h4": {
+     "n": 481,
+     "naive": 33.15,
+     "model": 34,
+     "calls": 356,
+     "callsRight": 216,
+     "moved": 418
+    }
+   }
+  },
+  "Cauliflower": {
+   "districts": 10,
+   "comparisonMarket": false,
+   "records": 9184,
+   "droppedAsOutliers": 7,
+   "leadWeeks": 384,
+   "leadLastWeek": "2026-11-23",
+   "all": {
+    "h1": {
+     "n": 1726,
+     "naive": 22.2,
+     "model": 22.58,
+     "calls": 1094,
+     "callsRight": 575,
+     "moved": 1314
+    },
+    "h2": {
+     "n": 1619,
+     "naive": 36.16,
+     "model": 33.45,
+     "calls": 1296,
+     "callsRight": 738,
+     "moved": 1359
+    },
+    "h4": {
+     "n": 1457,
+     "naive": 61.27,
+     "model": 45.94,
+     "calls": 1326,
+     "callsRight": 867,
+     "moved": 1329
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 342,
+     "naive": 19.02,
+     "model": 21.2,
+     "calls": 217,
+     "callsRight": 101,
+     "moved": 232
+    },
+    "h2": {
+     "n": 329,
+     "naive": 31.61,
+     "model": 30.9,
+     "calls": 262,
+     "callsRight": 141,
+     "moved": 262
+    },
+    "h4": {
+     "n": 306,
+     "naive": 53.19,
+     "model": 43.15,
+     "calls": 268,
+     "callsRight": 170,
+     "moved": 278
+    }
+   }
+  },
+  "Pumpkin": {
+   "districts": 9,
+   "comparisonMarket": false,
+   "records": 10915,
+   "droppedAsOutliers": 4,
+   "leadWeeks": 536,
+   "leadLastWeek": "2026-11-23",
+   "all": {
+    "h1": {
+     "n": 1912,
+     "naive": 10.4,
+     "model": 11.5,
+     "calls": 453,
+     "callsRight": 213,
+     "moved": 1127
+    },
+    "h2": {
+     "n": 1842,
+     "naive": 12.52,
+     "model": 13.83,
+     "calls": 626,
+     "callsRight": 299,
+     "moved": 1224
+    },
+    "h4": {
+     "n": 1743,
+     "naive": 16.35,
+     "model": 17.81,
+     "calls": 967,
+     "callsRight": 494,
+     "moved": 1311
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 498,
+     "naive": 9.88,
+     "model": 10.71,
+     "calls": 114,
+     "callsRight": 56,
+     "moved": 290
+    },
+    "h2": {
+     "n": 488,
+     "naive": 12.16,
+     "model": 13.36,
+     "calls": 173,
+     "callsRight": 87,
+     "moved": 315
+    },
+    "h4": {
+     "n": 474,
+     "naive": 16.01,
+     "model": 17.06,
+     "calls": 228,
+     "callsRight": 122,
+     "moved": 343
+    }
+   }
+  },
+  "Brinjal": {
+   "districts": 11,
+   "comparisonMarket": false,
+   "records": 15190,
+   "droppedAsOutliers": 3,
+   "leadWeeks": 501,
+   "leadLastWeek": "2026-11-23",
+   "all": {
+    "h1": {
+     "n": 3447,
+     "naive": 14.28,
+     "model": 15.62,
+     "calls": 1239,
+     "callsRight": 612,
+     "moved": 2428
+    },
+    "h2": {
+     "n": 3363,
+     "naive": 19.46,
+     "model": 21.03,
+     "calls": 1834,
+     "callsRight": 963,
+     "moved": 2636
+    },
+    "h4": {
+     "n": 3207,
+     "naive": 26.5,
+     "model": 27.2,
+     "calls": 2276,
+     "callsRight": 1321,
+     "moved": 2695
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 453,
+     "naive": 14.86,
+     "model": 15.58,
+     "calls": 158,
+     "callsRight": 79,
+     "moved": 322
+    },
+    "h2": {
+     "n": 444,
+     "naive": 19.17,
+     "model": 20.35,
+     "calls": 273,
+     "callsRight": 146,
+     "moved": 352
+    },
+    "h4": {
+     "n": 425,
+     "naive": 27.71,
+     "model": 28.53,
+     "calls": 339,
+     "callsRight": 199,
+     "moved": 362
+    }
+   }
+  },
+  "Onion": {
+   "districts": 19,
+   "comparisonMarket": false,
+   "records": 23210,
+   "droppedAsOutliers": 5,
+   "leadWeeks": 893,
+   "leadLastWeek": "2026-11-23",
+   "all": {
+    "h1": {
+     "n": 5909,
+     "naive": 8.55,
+     "model": 9.58,
+     "calls": 1007,
+     "callsRight": 428,
+     "moved": 2950
+    },
+    "h2": {
+     "n": 5802,
+     "naive": 12.46,
+     "model": 13.91,
+     "calls": 2023,
+     "callsRight": 980,
+     "moved": 3573
+    },
+    "h4": {
+     "n": 5631,
+     "naive": 18.64,
+     "model": 20.4,
+     "calls": 3260,
+     "callsRight": 1839,
+     "moved": 4167
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 866,
+     "naive": 8.35,
+     "model": 8.94,
+     "calls": 180,
+     "callsRight": 92,
+     "moved": 463
+    },
+    "h2": {
+     "n": 861,
+     "naive": 12.74,
+     "model": 13.55,
+     "calls": 363,
+     "callsRight": 196,
+     "moved": 564
+    },
+    "h4": {
+     "n": 851,
+     "naive": 19.48,
+     "model": 19.9,
+     "calls": 568,
+     "callsRight": 352,
+     "moved": 652
+    }
+   }
+  },
+  "Green Chilli": {
+   "districts": 16,
+   "comparisonMarket": false,
+   "records": 23426,
+   "droppedAsOutliers": 49,
+   "leadWeeks": 657,
+   "leadLastWeek": "2026-11-23",
+   "all": {
+    "h1": {
+     "n": 4915,
+     "naive": 15.74,
+     "model": 17.47,
+     "calls": 1799,
+     "callsRight": 873,
+     "moved": 3257
+    },
+    "h2": {
+     "n": 4810,
+     "naive": 21.44,
+     "model": 23.34,
+     "calls": 2712,
+     "callsRight": 1489,
+     "moved": 3669
+    },
+    "h4": {
+     "n": 4628,
+     "naive": 30.01,
+     "model": 30.32,
+     "calls": 3548,
+     "callsRight": 2131,
+     "moved": 3822
+    }
+   },
+   "lead": {
+    "h1": {
+     "n": 629,
+     "naive": 14.18,
+     "model": 15.68,
+     "calls": 189,
+     "callsRight": 83,
+     "moved": 364
+    },
+    "h2": {
+     "n": 618,
+     "naive": 19.89,
+     "model": 21.47,
+     "calls": 296,
+     "callsRight": 155,
+     "moved": 429
+    },
+    "h4": {
+     "n": 584,
+     "naive": 27.69,
+     "model": 28.16,
+     "calls": 427,
+     "callsRight": 259,
+     "moved": 452
+    }
+   }
+  }
+ },
+ "survey": {
+  "staples": {
+   "Paddy": 46,
+   "Jute": 11,
+   "Arecanut": 1,
+   "Mustard": 303
+  },
+  "note": "Newest records for all of Assam (lowercase-field index, from late 2025), counted on 25 Nov 2026. The bulk copy holds no Assam records for paddy, jute or arecanut dated 2023 or later, and 5 for mustard."
+ },
+ "links": {
+  "demo": "https://avganimeotaku.github.io/nesfic-d35-price-forecast/",
+  "code": "https://github.com/avgAnimeOtaku/nesfic-d35-price-forecast"
+ }
 }

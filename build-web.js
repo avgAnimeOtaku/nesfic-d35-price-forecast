@@ -76,6 +76,12 @@ const swept = JSON.parse(vm.runInContext(`(function () {
   }
   return JSON.stringify({ n: n, crops: out });
 })()`, box));
+// The browser bundle and the command-line analysis must agree on the whole-record replay.
+const replayed = JSON.parse(src('out/results.json')).replay;
+for (const c of swept.crops) for (const w of c.whole) {
+  const r = replayed[c.crop].all['h' + w.h];
+  assert(w.n === r.n && Math.abs(w.model - r.model) < 0.01 && Math.abs(w.naive - r.naive) < 0.01, `replay differs between browser bundle and analysis for ${c.crop} at ${w.h} weeks`);
+}
 console.log(`docs/ built. Bundle check passed: 4-week potato forecast Rs ${Math.round(f.point)}; ${swept.n} crop, district and look-ahead forecasts all valid.`);
 console.log('Whole-record replay per crop, all districts (the test shown on the web page):');
 for (const c of swept.crops) for (const w of c.whole) console.log(`  ${c.crop.padEnd(13)} ${c.districts} districts, ${w.h} week(s) ahead: ${w.n} forecasts, miss ${w.model.toFixed(1)}% against ${w.naive.toFixed(1)}% for "price stays the same"; ${w.calls} hold or sell calls (${Math.round(100 * w.calls / w.n)}%), direction right in ${w.calls ? Math.round(100 * w.right / w.calls) + '%' : '-'}`);

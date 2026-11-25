@@ -4,3 +4,5 @@ proposal/
 out/webapp-check.png
 # Template for the portal answers (same draft text)
 proposal.js
+# Demo video and narration (large files, kept local)
+out/demo/

@@ -146,13 +146,13 @@ const results = {
   testSeries: leadBt[4].points.map(p => ({ week: iso(p.week), actual: round(p.actual, 0), model: round(p.model, 0), naive: round(p.naive, 0), lo: round(p.lo, 0), hi: round(p.hi, 0) })),
 };
 fs.mkdirSync(path.join(__dirname, 'out'), { recursive: true });
-fs.writeFileSync(path.join(__dirname, 'out', 'results.json'), JSON.stringify(results, null, 1));
 // ---- more crops for the web app: the same cleaning and weekly prices, with no comparison market.
 // They are not part of results.json, so the Proof of Work and the proposal text stay about potato.
 // Rice is left out on purpose: its reported Kamrup price jumps from about Rs 3,300 to Rs 7,500 within two weeks in February 2026
 // and stays there, which reads as a change in what is being reported and not a market move.
 const EXTRA = ['Tomato', 'Cabbage', 'Cauliflower', 'Pumpkin', 'Brinjal', 'Onion', 'Green Chilli'];
 const crops = { Potato: { lead: LEAD, ref: { label: ref.info.label, series: [...R] }, districts: weekly } };
+const cropInfo = {}; // records and coverage of each extra crop, for the Proof of Work
 for (const crop of EXTRA) {
   const slug = crop.toLowerCase().split(' ').join('-'), got = lineCount(`assam-kamrup-${slug}-2026.jsonl`), want = (totals.crops || {})[crop];
   // The newest records arrive in no date order, so a part-finished download would leave false gaps. Such a crop is left out.
@@ -164,8 +164,33 @@ for (const crop of EXTRA) {
   if (!cropDistricts[LEAD]) { console.log(`extra crop ${crop}: no usable ${LEAD} series, left out`); continue; }
   crops[crop] = { lead: LEAD, ref: null, districts: cropDistricts };
   const lastLead = cropDistricts[LEAD].reduce((m, e) => Math.max(m, e[0]), 0);
+  cropInfo[crop] = { records: rows.length, droppedAsOutliers: dropped, leadWeeks: cropDistricts[LEAD].length, leadLastWeek: iso(lastLead) };
   console.log(`extra crop ${crop}: ${rows.length} records (${dropped} dropped as outliers), ${Object.keys(cropDistricts).length} districts with 60 or more weeks, ${LEAD} ${cropDistricts[LEAD].length} weeks to ${iso(lastLead)}`);
 }
+// The model replayed over each district's whole record (not only the last 156 weeks), pooled across districts.
+// The first weeks, before the model has enough history to be fitted and only repeats the last price, are left out.
+function replay(seriesByDistrict, Rmap) {
+  const pool = {};
+  for (const entries of Object.values(seriesByDistrict)) {
+    const S = new Map(entries), ks = [...S.keys()];
+    const bt = backtest(S, Rmap, { ...SETUP, testWeeks: Math.max(...ks) - Math.min(...ks) + 1 });
+    for (const h of SETUP.horizons) (pool[h] = pool[h] || []).push(...bt[h].points.filter(p => p.hi > p.lo));
+  }
+  const miss = (pts, k) => round(pts.reduce((s, p) => s + 100 * Math.abs(p[k] - p.actual) / p.actual, 0) / pts.length, 2);
+  return Object.fromEntries(SETUP.horizons.map(h => {
+    const pts = pool[h], calls = pts.filter(p => Math.abs(p.model / p.base - 1) >= 0.05);
+    return ['h' + h, { n: pts.length, naive: miss(pts, 'naive'), model: miss(pts, 'model'), calls: calls.length,
+      callsRight: calls.filter(p => Math.sign(p.model - p.base) === Math.sign(p.actual - p.base)).length,
+      moved: pts.filter(p => Math.abs(p.actual / p.base - 1) >= 0.05).length }];
+  }));
+}
+results.replay = Object.fromEntries(Object.entries(crops).map(([crop, c]) => {
+  const Rm = new Map(c.ref ? c.ref.series : []);
+  return [crop, { districts: Object.keys(c.districts).length, comparisonMarket: !!c.ref, ...cropInfo[crop], all: replay(c.districts, Rm), lead: replay({ [LEAD]: c.districts[LEAD] }, Rm) }];
+}));
+results.survey = { staples: totals.staples, note: totals.staplesNote };
+results.links = { demo: 'https://avganimeotaku.github.io/nesfic-d35-price-forecast/', code: 'https://github.com/avgAnimeOtaku/nesfic-d35-price-forecast' };
+fs.writeFileSync(path.join(__dirname, 'out', 'results.json'), JSON.stringify(results, null, 1));
 fs.writeFileSync(path.join(__dirname, 'out', 'weekly.json'), JSON.stringify({ generatedAt: results.generatedAt, crops }));
 
 // ---- console summary
